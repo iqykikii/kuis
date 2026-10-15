@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kuis Interaktif PAK - FEBI IDIAQ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-slate-50 via-red-50/30 to-slate-100 text-slate-800 min-h-screen flex flex-col">
+
+    <!-- Header / Navbar -->
+    <header class="bg-white/90 backdrop-blur-md border-b border-slate-200 sticky top-0 z-50 shadow-sm">
+        <div class="max-w-4xl mx-auto px-4 py-3 flex justify-between items-center gap-3">
+            <div class="flex items-center gap-3">
+                <img src="Logo-IDaqu-1024x733.png" alt="Logo IDAQ" class="w-10 h-10 object-contain p-1 rounded-xl bg-red-50 border border-red-100">
+                <div>
+                    <h1 class="text-sm sm:text-base font-bold tracking-tight text-slate-900">Kuis Interaktif PAK</h1>
+                    <p class="text-[11px] text-slate-500 font-medium">Fakultas Ekonomi dan Bisnis Islam</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2">
+                <!-- Tombol Kontrol Backsound -->
+                <button onclick="toggleBGM()" id="bgm-toggle-btn" class="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-300 text-xs font-semibold text-slate-700 transition flex items-center gap-1.5">
+                    🔇 Musik: Off
+                </button>
+                <nav class="flex gap-1.5 bg-slate-100 p-1 rounded-xl border border-slate-200 text-xs">
+                    <button onclick="switchTab('kuis')" id="btn-kuis" class="px-3.5 py-1.5 rounded-lg font-semibold bg-red-600 text-white shadow-sm transition">📝 Main Kuis</button>
+                    <button onclick="switchTab('leaderboard')" id="btn-leaderboard" class="px-3.5 py-1.5 rounded-lg font-semibold text-slate-600 hover:text-slate-900 transition">🏆 Leaderboard</button>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="flex-grow max-w-4xl w-full mx-auto p-4 sm:p-6 flex flex-col justify-center">
+
+        <!-- TAB: KUIS -->
+        <section id="tab-kuis" class="w-full space-y-6">
+            
+            <!-- 1. Halaman Depan / Lobby (Pilih Karakter & Identitas) -->
+            <div id="quiz-instruction-card" class="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-xl space-y-6 max-w-3xl mx-auto">
+                <div class="text-center space-y-3">
+                    <span class="inline-block bg-red-100 text-red-700 text-xs px-3.5 py-1 rounded-full uppercase tracking-wider font-bold">
+                        20 Soal Interaktif: Konsep dan Studi Kasus
+                    </span>
+                    <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900">Pendidikan Anti Korupsi</h2>
+                    
+                    <div class="bg-slate-50 border border-slate-200 p-4 rounded-2xl text-xs space-y-1 max-w-md mx-auto text-slate-600">
+                        <p><span class="font-bold text-slate-800">Institusi:</span> Institut Daarul Qur'an Jakarta</p>
+                        <p><span class="font-bold text-slate-800">Fakultas:</span> Fakultas Ekonomi dan Bisnis Islam</p>
+                        <p><span class="font-bold text-slate-800">Dosen Pengampu:</span> Rizki Dwi Anggraini, S.E., M.Ak</p>
+                    </div>
+                </div>
+
+                <form id="form-register" onsubmit="startQuiz(event)" class="space-y-5 pt-2">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Nama Lengkap Mahasiswa</label>
+                            <input type="text" id="student-name" required placeholder="Contoh: Siti Aisyah" class="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-xl text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-red-500 transition">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">NPM / NIM</label>
+                            <input type="text" id="student-npm" required placeholder="Contoh: 2023101002" class="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-xl text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-red-500 transition">
+                        </div>
+                    </div>
+
+                    <!-- Pilihan 20 Karakter -->
+                    <div class="space-y-2">
+                        <label class="block text-xs font-semibold text-slate-700">Pilih Karakter Anda (1 dari 20 Karakter):</label>
+                        <div id="character-grid" class="grid grid-cols-4 sm:grid-cols-5 gap-2 max-h-44 overflow-y-auto p-2 bg-slate-50 rounded-2xl border border-slate-200">
+                            <!-- Di-generate via JS -->
+                        </div>
+                    </div>
+
+                    <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3.5 rounded-xl text-sm shadow-md transition transform hover:-translate-y-0.5 tracking-wide">
+                        🚀 MULAI KERJAKAN!
+                    </button>
+                </form>
+            </div>
+
+            <!-- 2. Arena Soal Kuis -->
+            <div id="quiz-question-card" class="hidden bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-xl space-y-6 max-w-3xl mx-auto">
+                
+                <!-- Top Status Bar & Action Panel (Booster & Sabotase Teman) -->
+                <div class="flex flex-col sm:flex-row justify-between items-center bg-slate-50 px-4 py-3 rounded-xl border border-slate-200 gap-3">
+                    <div class="flex items-center gap-3 flex-wrap">
+                        <div id="active-char-badge" class="bg-red-100 text-red-700 text-xs px-2.5 py-1 rounded-lg font-bold flex items-center gap-1"></div>
+                        <span id="quiz-progress" class="text-xs font-bold uppercase tracking-wider text-red-600">Soal 1 / 20</span>
+                        <span class="text-xs font-semibold text-slate-700">⭐ Skor: <span id="current-score-display">0</span></span>
+                        <span id="quiz-timer" class="text-xs font-mono font-semibold bg-red-100 text-red-700 px-3 py-1 rounded-lg border border-red-200">⏳ <span id="timer-count">30</span>s</span>
+                    </div>
+
+                    <div class="flex gap-2 flex-wrap">
+                        <!-- Booster -->
+                        <button onclick="useBoosterTime()" id="booster-time-btn" class="px-2.5 py-1 bg-amber-500 hover:bg-amber-600 text-white rounded-lg text-xs font-bold shadow-xs transition">⏱️ +10s</button>
+                        <button onclick="useBoosterFifty()" id="booster-fifty-btn" class="px-2.5 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold shadow-xs transition">❌ 50:50</button>
+                        <!-- Fitur Ganggu Teman -->
+                        <button onclick="prankFriend()" id="prank-btn" class="px-2.5 py-1 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-xs font-bold shadow-xs transition">👻 Ganggu Teman</button>
+                    </div>
+                </div>
+
+                <p id="board-event-msg" class="text-center text-xs font-semibold text-amber-600 h-4"></p>
+
+                <!-- Media / Image Container -->
+                <div id="question-media-container" class="hidden text-center bg-slate-50 p-3 rounded-2xl border border-slate-200">
+                    <img id="question-image" src="" alt="Ilustrasi Kuis" class="max-h-48 mx-auto rounded-xl shadow-sm object-cover">
+                </div>
+
+                <!-- Question Text -->
+                <div>
+                    <h3 id="question-text" class="text-base sm:text-lg font-bold text-slate-900 leading-snug mb-4"></h3>
+                    <div id="options-container" class="grid grid-cols-1 gap-3"></div>
+                </div>
+
+                <!-- Rationale Box -->
+                <div id="rationale-box" class="hidden bg-slate-50 border border-slate-200 p-4 rounded-2xl text-xs text-slate-600 space-y-1">
+                    <span class="font-bold block text-red-700">📌 Analisis & Pembahasan:</span>
+                    <p id="rationale-text"></p>
+                </div>
+
+                <!-- Next Button -->
+                <div class="flex justify-end pt-2">
+                    <button id="next-btn" onclick="nextQuestion()" class="hidden bg-red-600 hover:bg-red-700 text-white font-bold px-6 py-3 rounded-xl text-sm shadow-sm transition">
+                        Soal Berikutnya &rarr;
+                    </button>
+                </div>
+            </div>
+
+            <!-- 3. Result Card -->
+            <div id="quiz-result-card" class="hidden bg-white border border-slate-200 rounded-3xl p-8 max-w-md mx-auto text-center space-y-5 shadow-xl">
+                <div class="w-20 h-20 bg-amber-100 text-amber-700 rounded-3xl flex items-center justify-center mx-auto text-3xl font-black shadow-inner">🏆</div>
+                <div class="space-y-1">
+                    <h2 class="text-2xl font-bold text-slate-900">Kuis Selesai!</h2>
+                    <p class="text-xs text-slate-500">Anda berhasil menuntaskan 20 soal Pendidikan Anti Korupsi.</p>
+                </div>
+                <div class="bg-slate-50 border border-slate-200 p-5 rounded-2xl my-2 space-y-1">
+                    <span class="text-xs text-slate-500 block">Total Skor Akhir</span>
+                    <span id="final-score" class="text-4xl font-black text-red-600">0</span>
+                    <div class="flex justify-center gap-4 text-xs font-semibold pt-2 text-slate-600">
+                        <span class="text-emerald-700">Benar: <span id="final-correct">0</span></span>
+                        <span class="text-rose-700">Salah: <span id="final-wrong">0</span></span>
+                    </div>
+                </div>
+                <div class="flex gap-2 justify-center pt-2">
+                    <button onclick="switchTab('leaderboard')" class="bg-red-600 hover:bg-red-700 text-white font-bold px-5 py-3 rounded-xl text-xs shadow-sm transition">
+                        🏆 Cek Leaderboard
+                    </button>
+                    <button onclick="resetQuiz()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold px-5 py-3 rounded-xl text-xs transition">
+                        🔄 Main Lagi
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB: LEADERBOARD -->
+        <section id="tab-leaderboard" class="hidden w-full space-y-6">
+            <div class="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-xl">
+                <div class="flex justify-between items-center mb-6">
+                    <div>
+                        <h2 class="text-xl font-bold text-slate-900">Papan Peringkat Mahasiswa</h2>
+                        <p class="text-xs text-slate-500">Fakultas Ekonomi dan Bisnis Islam IDIAQ</p>
+                    </div>
+                    <button onclick="loadLeaderboard()" class="text-xs font-semibold text-red-600 hover:text-red-700 bg-red-50 px-3.5 py-2 rounded-xl border border-red-200 transition">
+                        🔄 Refresh
+                    </button>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-sm">
+                        <thead>
+                            <tr class="border-b border-slate-200 text-slate-500 text-xs uppercase tracking-wider">
+                                <th class="py-3 px-3 font-semibold">Rank</th>
+                                <th class="py-3 px-3 font-semibold">Karakter & Nama</th>
+                                <th class="py-3 px-3 font-semibold">NPM</th>
+                                <th class="py-3 px-3 font-semibold text-center">Benar / Salah</th>
+                                <th class="py-3 px-3 font-semibold text-right">Skor</th>
+                            </tr>
+                        </thead>
+                        <tbody id="leaderboard-body" class="divide-y divide-slate-100">
+                            <!-- Populated via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="text-center py-6 text-xs text-slate-400 border-t border-slate-200 mt-auto">
+        &copy; 2026 Pendidikan Anti Korupsi • Institut Daarul Qur'an Jakarta
+    </footer>
+
+    <!-- Quiz Logic & 20 Lengkap Soal (Konsep, Studi Kasus, 5 Gambar & Sabotase Teman) -->
+    <script>
+        const characters = [
+            { id: 1, name: "Detektif Integritas", emoji: "🕵️‍♂️" },
+            { id: 2, name: "Akuntan Jujur", emoji: "📊" },
+            { id: 3, name: "Ksatria Amanah", emoji: "🛡️" },
+            { id: 4, name: "Audit Master", emoji: "🔍" },
+            { id: 5, name: "Pejuang Anti Suap", emoji: "⚖️" },
+            { id: 6, name: "Srikandi Anti Korupsi", emoji: "👩‍💼" },
+            { id: 7, name: "Pemuda Berakhlak", emoji: "🧑‍🎓" },
+            { id: 8, name: "Pakar Syariah", emoji: "📜" },
+            { id: 9, name: "Bintang Kampus", emoji: "⭐" },
+            { id: 10, name: "Inspektur Bersih", emoji: "🔎" },
+            { id: 11, name: "Pengawas Teladan", emoji: "📋" },
+            { id: 12, name: "Penjaga Moral", emoji: "🏛️" },
+            { id: 13, name: "Arsitek Transparansi", emoji: "📐" },
+            { id: 14, name: "Aktivis Muda", emoji: "📢" },
+            { id: 15, name: "Cendekiawan Millenial", emoji: "💡" },
+            { id: 16, name: "Pejuang Kejujuran", emoji: "🌟" },
+            { id: 17, name: "Duta Integritas", emoji: "🏆" },
+            { id: 18, name: "Pelopor Keadilan", emoji: "🦅" },
+            { id: 19, name: "Pengawal Konstitusi", emoji: "📖" },
+            { id: 20, name: "Pahlawan Nurani", emoji: "💖" }
+        ];
+
+        let selectedCharacter = characters[0];
+
+        function renderCharacterSelection() {
+            const grid = document.getElementById('character-grid');
+            grid.innerHTML = '';
+            characters.forEach((char, index) => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = `p-2.5 rounded-xl border flex flex-col items-center justify-center gap-1 transition text-center text-xs font-semibold ${index === 0 ? 'border-red-600 bg-red-50 text-red-900 ring-2 ring-red-200' : 'border-slate-200 bg-white hover:border-slate-400 text-slate-700'}`;
+                btn.innerHTML = `<span class="text-2xl">${char.emoji}</span><span class="truncate w-full">${char.name}</span>`;
+                btn.onclick = () => {
+                    document.querySelectorAll('#character-grid button').forEach(b => {
+                        b.className = "p-2.5 rounded-xl border border-slate-200 bg-white hover:border-slate-400 text-slate-700 flex flex-col items-center justify-center gap-1 transition text-center text-xs font-semibold";
+                    });
+                    btn.className = "p-2.5 rounded-xl border border-red-600 bg-red-50 text-red-900 ring-2 ring-red-200 flex flex-col items-center justify-center gap-1 transition text-center text-xs font-semibold";
+                    selectedCharacter = char;
+                };
+                grid.appendChild(btn);
+            });
+        }
+        renderCharacterSelection();
+
+        // 20 SOAL LENGKAP
+        const quizData = [
+            {
+                question: "1. Menurut definisi World Bank (2000), apa arti dari korupsi secara universal?",
+                image: "",
+                answerOptions: [
+                    { text: "The abuse of public power for private gain", isCorrect: true },
+                    { text: "Peminjaman dana tanpa bunga antar warga", isCorrect: false },
+                    { text: "Kelalaian administratif perkantoran", isCorrect: false },
+                    { text: "Pemberian hibah sosial kepada fakir miskin", isCorrect: false }
+                ],
+                rationale: "World Bank mendefinisikan korupsi sebagai penyalahgunaan kekuasaan publik untuk keuntungan pribadi."
+            },
+            {
+                question: "2. Dalam perspektif Islam, suap menyuap atau pemberian kepada pihak berwenang untuk memenangkan perkara yang tidak dibenarkan disebut...",
+                image: "",
+                answerOptions: [
+                    { text: "Risywah", isCorrect: true },
+                    { text: "Ghanimah", isCorrect: false },
+                    { text: "Qiradh", isCorrect: false },
+                    { text: "Wadi'ah", isCorrect: false }
+                ],
+                rationale: "Risywah adalah suap yang diharamkan dalam Islam dan termasuk dosa besar yang merusak keadilan."
+            },
+            {
+                question: "3. Manakah nilai-nilai utama yang sangat bertentangan dengan perbuatan korupsi?",
+                image: "",
+                answerOptions: [
+                    { text: "Kejujuran, Amanah, dan Integritas", isCorrect: true },
+                    { text: "Kelicikan, Egoisme, dan Materialisme", isCorrect: false },
+                    { text: "Kewaspadaan berlebih", isCorrect: false },
+                    { text: "Senioritas mutlak", isCorrect: false }
+                ],
+                rationale: "Kejujuran, amanah, dan integritas merupakan nilai luhur utama anti korupsi."
+            },
+            {
+                question: "4. Apa arti kata dasar 'integer' dari bahasa Latin yang menjadi asal kata Integritas?",
+                image: "",
+                answerOptions: [
+                    { text: "Keutuhan, utuh, dan keseluruhan", isCorrect: true },
+                    { text: "Kecerdasan intelektual tinggi", isCorrect: false },
+                    { text: "Kekayaan finansial", isCorrect: false },
+                    { text: "Kepatuhan mutlak", isCorrect: false }
+                ],
+                rationale: "Integer bermakna keutuhan dan konsistensi utuh antara prinsip, ucapan, dan tindakan."
+            },
+            {
+                question: "5. Berdasarkan Teori GONE oleh Jack Bologne (2006), faktor mana yang dikategorikan sebagai elemen internal?",
+                image: "",
+                answerOptions: [
+                    { text: "Greed (Keserakahan) dan Need (Kebutuhan)", isCorrect: true },
+                    { text: "Opportunity dan Exposure", isCorrect: false },
+                    { text: "Legal Structure", isCorrect: false },
+                    { text: "Faktor Sosial eksternal", isCorrect: false }
+                ],
+                rationale: "Greed dan Need melekat pada diri individu (faktor internal)."
+            },
+            {
+                question: "6. [Studi Kasus] Bendahara instansi mengetahui uang kas bukan miliknya, namun tetap mengambil sebagian untuk kepentingan pribadi karena merasa aman. Hal ini mencerminkan...",
+                image: "",
+                answerOptions: [
+                    { text: "Faktor internal moral lemah dan penggelapan dalam jabatan", isCorrect: true },
+                    { text: "Sedekah tersembunyi", isCorrect: false },
+                    { text: "Kelalaian administratif", isCorrect: false },
+                    { text: "Hak istimewa jabatan", isCorrect: false }
+                ],
+                rationale: "Tindakan ini adalah penggelapan dalam jabatan akibat moral yang lemah."
+            },
+            {
+                question: "7. [Studi Kasus] Pejabat pengadaan ikut menentukan perusahaan pemenang tender milik keluarganya sendiri. Kasus ini termasuk...",
+                image: "",
+                answerOptions: [
+                    { text: "Benturan kepentingan dalam pengadaan (Conflict of Interest)", isCorrect: true },
+                    { text: "Pengelolaan aset transparan", isCorrect: false },
+                    { text: "Hadiah sah", isCorrect: false },
+                    { text: "Efisiensi anggaran", isCorrect: false }
+                ],
+                rationale: "Benturan kepentingan terjadi saat wewenang bercampur dengan kepentingan pribadi atau keluarga."
+            },
+            {
+                question: "8. Apa perbedaan mendasar antara Gratifikasi dan Suap dalam tindak pidana korupsi?",
+                image: "",
+                answerOptions: [
+                    { text: "Gratifikasi adalah pemberian luas tanpa janji awal, suap terikat kesepakatan timbal balik", isCorrect: true },
+                    { text: "Gratifikasi selalu legal di bawah 1 juta", isCorrect: false },
+                    { text: "Suap tidak melanggar hukum", isCorrect: false },
+                    { text: "Tidak ada perbedaan", isCorrect: false }
+                ],
+                rationale: "Gratifikasi mencakup pemberian terkait jabatan tanpa permufakatan transaksional di awal."
+            },
+            {
+                question: "9. Manakah di bawah ini yang merupakan contoh perilaku koruptif di lingkungan kehidupan mahasiswa?",
+                image: "",
+                answerOptions: [
+                    { text: "Melakukan titip absen kepada rekan saat perkuliahan", isCorrect: true },
+                    { text: "Mengerjakan tugas esai mandiri", isCorrect: false },
+                    { text: "Datang tepat waktu", isCorrect: false },
+                    { text: "Mengembalikan dompet", isCorrect: false }
+                ],
+                rationale: "Titip absen adalah cikal bakal ketidakjujuran akademik."
+            },
+            {
+                question: "10. Apa fokus utama dari elemen 'Opportunity' (Kesempatan) dalam pemicu terjadinya korupsi?",
+                image: "",
+                answerOptions: [
+                    { text: "Celah kelemahan sistem, minimnya pengawasan, dan buruknya tata kelola organisasi", isCorrect: true },
+                    { text: "Sifat rakus bawaan", isCorrect: false },
+                    { text: "Keterdesakan biaya hidup", isCorrect: false },
+                    { text: "Tingginya kesadaran hukum", isCorrect: false }
+                ],
+                rationale: "Kesempatan muncul karena struktur pengawasan yang lemah."
+            },
+            // SOAL BERGAMBAR 1
+            {
+                question: "11. [Tebak Gambar] Perhatikan ilustrasi di atas. Seseorang mengangkat telapak tangan menolak amplop berisi uang di atas meja kontrak. Sikap ini merepresentasikan...",
+                image: "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=600&q=80",
+                answerOptions: [
+                    { text: "Penolakan terhadap suap (risywah) dan komitmen menjaga integritas diri", isCorrect: true },
+                    { text: "Negosiasi kontrak sah", isCorrect: false },
+                    { text: "Penerimaan gratifikasi resmi", isCorrect: false },
+                    { text: "Penghitungan gaji", isCorrect: false }
+                ],
+                rationale: "Menolak amplop suap di atas meja dokumen kontrak adalah cerminan integritas diri."
+            },
+            // SOAL BERGAMBAR 2
+            {
+                question: "12. [Tebak Gambar] Perhatikan ilustrasi di atas. Sekelompok orang sedang menyusun potongan puzzle bersama di meja kerja. Dalam konteks tata kelola, hal ini berkaitan dengan...",
+                image: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=600&q=80",
+                answerOptions: [
+                    { text: "Pentingnya kolaborasi organisasi, transparansi, dan keselarasan sistem kerja", isCorrect: true },
+                    { text: "Manipulasi laporan rahasia", isCorrect: false },
+                    { text: "Monopoli proyek", isCorrect: false },
+                    { text: "Pemisahan tugas lemah", isCorrect: false }
+                ],
+                rationale: "Kerja sama dan keselarasan organisasi memperkuat sistem pencegahan korupsi."
+            },
+            // SOAL BERGAMBAR 3
+            {
+                question: "13. [Tebak Gambar] Perhatikan ilustrasi rapat tim di atas dengan fokus pada transparansi papan tulis finansial. Hal ini mencerminkan prinsip antikorupsi berupa...",
+                image: "https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=600&q=80",
+                answerOptions: [
+                    { text: "Akuntabilitas dan keterbukaan pengelolaan informasi publik", isCorrect: true },
+                    { text: "Penyembunyian dokumen rahasia perusahaan", isCorrect: false },
+                    { text: "Dominasi keputusan sepihak pimpinan", isCorrect: false },
+                    { text: "Penggelapan laporan keuangan", isCorrect: false }
+                ],
+                rationale: "Transparansi dan akuntabilitas papan tulis mencerminkan tata kelola yang bersih."
+            },
+            // SOAL BERGAMBAR 4
+            {
+                question: "14. [Tebak Gambar] Perhatikan ilustrasi gavel (palu hakim) di atas. Dalam penegakan hukum tindak pidana korupsi, palu sidang menyimbolkan...",
+                image: "https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&w=600&q=80",
+                answerOptions: [
+                    { text: "Keadilan hukum yang tegas tanpa pandang bulu terhadap pelaku korupsi", isCorrect: true },
+                    { text: "Pemberian kelonggaran hukuman bagi pejabat", isCorrect: false },
+                    { text: "Proses pelelangan barang sitaan negara", isCorrect: false },
+                    { text: "Keputusan sepihak tanpa bukti otentik", isCorrect: false }
+                ],
+                rationale: "Palu hakim menyimbolkan keadilan hukum yang tegas bagi pelanggar hukum."
+            },
+            // SOAL BERGAMBAR 5
+            {
+                question: "15. [Tebak Gambar] Perhatikan ilustrasi tim audit yang memegang kaca pembesar dan dokumen laporan di atas. Peran auditor independen sangat penting untuk...",
+                image: "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=600&q=80",
+                answerOptions: [
+                    { text: "Mendeteksi kecurangan, audit kepatuhan, dan memperkuat elemen exposure (pengawasan)", isCorrect: true },
+                    { text: "Membantu menyembunyikan defisit anggaran", isCorrect: false },
+                    { text: "Memanipulasi data pajak perusahaan", isCorrect: false },
+                    { text: "Memperlambat kinerja birokrasi instansi", isCorrect: false }
+                ],
+                rationale: "Auditor berfungsi mendeteksi ketidakwajaran dan memperkuat pengawasan organisasi."
+            },
+            {
+                question: "16. Apa fungsi utama dari penegakan elemen 'Exposure' (Pengungkapan/Efek Jera) dalam mencegah korupsi?",
+                image: "",
+                answerOptions: [
+                    { text: "Memberikan sanksi tegas dan konsisten agar pelaku jera dan calon pelaku takut melanggar", isCorrect: true },
+                    { text: "Memberikan kebebasan mutlak", isCorrect: false },
+                    { text: "Menutupi kasus publik", isCorrect: false },
+                    { text: "Mempercepat birokrasi", isCorrect: false }
+                ],
+                rationale: "Exposure yang tegas menciptakan efek jera dan risiko tertangkap yang tinggi."
+            },
+            {
+                question: "17. [Studi Kasus] Mengapa kebiasaan melanggar aturan kecil (seperti tidak disiplin waktu atau titip absen) dianggap berbahaya dalam pendidikan anti korupsi?",
+                image: "",
+                answerOptions: [
+                    { text: "Karena dapat membentuk pola kebiasaan (perilaku koruptif) yang menormalisasi pelanggaran lebih besar", isCorrect: true },
+                    { text: "Langsung dijerat UU Tipikor berat", isCorrect: false },
+                    { text: "Tidak ada kaitan moral", isCorrect: false },
+                    { text: "Hanya merugikan waktu pribadi", isCorrect: false }
+                ],
+                rationale: "Perilaku koruptif berawal dari kebiasaan kecil yang dinormalisasi."
+            },
+            {
+                question: "18. Apa dampak negatif dari praktik politik uang (money politics) dalam pemilihan jabatan publik?",
+                image: "",
+                answerOptions: [
+                    { text: "Memicu pejabat terpilih melakukan korupsi proyek untuk mengembalikan modal kampanye", isCorrect: true },
+                    { text: "Menciptakan persaingan sehat", isCorrect: false },
+                    { text: "Menjamin transparansi", isCorrect: false },
+                    { text: "Meningkatkan kesejahteraan", isCorrect: false }
+                ],
+                rationale: "Politik uang memaksa politisi korupsi untuk menutup modal kampanye."
+            },
+            {
+                question: "19. Dalam tiga unsur sistem hukum (Friedman), apa yang dimaksud dengan 'Legal Structure'?",
+                image: "",
+                answerOptions: [
+                    { text: "Lembaga dan aparat penegak hukum (polisi, jaksa, pengadilan, auditor)", isCorrect: true },
+                    { text: "Isi teks undang-undang", isCorrect: false },
+                    { text: "Kebiasaan warga", isCorrect: false },
+                    { text: "Anggaran peradilan", isCorrect: false }
+                ],
+                rationale: "Legal structure berkaitan dengan institusi serta aparat penegak hukum."
+            },
+            {
+                question: "20. Apa bentuk pencegahan korupsi yang paling efektif ditanamkan di lingkungan perguruan tinggi?",
+                image: "",
+                answerOptions: [
+                    { text: "Membangun kultur kejujuran akademik, transparansi organisasi mahasiswa, dan mata kuliah PAK", isCorrect: true },
+                    { text: "Memberikan sanksi denda uang tunai di setiap kelas", isCorrect: false },
+                    { text: "Meniadakan seluruh ujian tertulis mahasiswa", isCorrect: false },
+                    { text: "Menyerahkan pengawasan sepenuhnya kepada satpam kampus", isCorrect: false }
+                ],
+                rationale: "Kultur akademik yang jujur dan pendidikan anti korupsi adalah fondasi pencegahan terbaik."
+            }
+        ];
+
+        let currentTab = 'kuis';
+        let studentInfo = { name: '', npm: '', character: null };
+        let currentLevel = 0; 
+        let score = 0;
+        let correctCount = 0;
+        let wrongCount = 0;
+        let timerInterval = null;
+        let timeLeft = 30;
+        let boosters = { time: true, fifty: true };
+
+        let audioCtx = null;
+        let bgmInterval = null;
+        let isBgmPlaying = false;
+
+        function toggleBGM() {
+            const btn = document.getElementById('bgm-toggle-btn');
+            if (!isBgmPlaying) {
+                if (!audioCtx) {
+                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+                startTaylorBeatBGM();
+                isBgmPlaying = true;
+                btn.innerHTML = "🔊 Musik: On";
+                btn.className = "px-3 py-1.5 rounded-xl bg-red-100 border border-red-300 text-xs font-semibold text-red-700 transition flex items-center gap-1.5";
+            } else {
+                stopBGMSequence();
+                isBgmPlaying = false;
+                btn.innerHTML = "🔇 Musik: Off";
+                btn.className = "px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-300 text-xs font-semibold text-slate-700 transition flex items-center gap-1.5";
+            }
+        }
+
+        function playTone(freq, duration, type = 'sine', vol = 0.05) {
+            if (!audioCtx || !isBgmPlaying) return;
+            try {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = type;
+                osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+                
+                gain.gain.setValueAtTime(vol, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                osc.start();
+                osc.stop(audioCtx.currentTime + duration);
+            } catch (e) {
+                console.log(e);
+            }
+        }
+
+        const taylorBeatMelody = [
+            330.00, 392.00, 440.00, 523.25, 440.00, 392.00,
+            349.23, 440.00, 523.25, 659.25, 523.25, 440.00,
+            293.66, 369.99, 440.00, 587.33, 440.00, 369.99, 329.63, 293.66
+        ];
+        let noteIndex = 0;
+
+        function startTaylorBeatBGM() {
+            clearInterval(bgmInterval);
+            bgmInterval = setInterval(() => {
+                if (!isBgmPlaying) return;
+                playTone(taylorBeatMelody[noteIndex], 0.2, 'triangle', 0.04);
+                if (noteIndex % 2 === 0) {
+                    playTone(164.81, 0.1, 'sawtooth', 0.02);
+                }
+                noteIndex = (noteIndex + 1) % taylorBeatMelody.length;
+            }, 250);
+        }
+
+        function stopBGMSequence() {
+            clearInterval(bgmInterval);
+        }
+
+        function switchTab(tabId) {
+            currentTab = tabId;
+            ['kuis', 'leaderboard'].forEach(t => {
+                document.getElementById(`tab-${t}`).classList.add('hidden');
+            });
+            document.getElementById(`btn-kuis`).className = "px-3.5 py-1.5 rounded-lg font-semibold text-slate-600 hover:text-slate-900 transition";
+            document.getElementById(`btn-leaderboard`).className = "px-3.5 py-1.5 rounded-lg font-semibold text-slate-600 hover:text-slate-900 transition";
+
+            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+            document.getElementById(`btn-${tabId}`).className = "px-3.5 py-1.5 rounded-lg font-semibold bg-red-600 text-white shadow-sm transition";
+
+            if (tabId === 'leaderboard') {
+                loadLeaderboard();
+            }
+        }
+
+        function useBoosterTime() {
+            if (!boosters.time) return alert('Booster Waktu Ekstra sudah digunakan!');
+            boosters.time = false;
+            timeLeft += 10;
+            document.getElementById('timer-count').innerText = timeLeft;
+            const btn = document.getElementById('booster-time-btn');
+            btn.classList.add('opacity-40', 'cursor-not-allowed');
+            btn.innerText = "⏱️ Used";
+            playTone(880, 0.15, 'square', 0.08);
+        }
+
+        function useBoosterFifty() {
+            if (!boosters.fifty) return alert('Booster 50:50 sudah digunakan!');
+            boosters.fifty = false;
+            
+            const container = document.getElementById('options-container');
+            const buttons = Array.from(container.children);
+            const q = quizData[currentLevel];
+            
+            let hiddenCount = 0;
+            buttons.forEach(btn => {
+                const text = btn.querySelector('span').innerText;
+                const isCorrect = q.answerOptions.find(o => o.text === text)?.isCorrect;
+                if (!isCorrect && hiddenCount < 2) {
+                    btn.style.display = 'none';
+                    hiddenCount++;
+                }
+            });
+
+            const btn = document.getElementById('booster-fifty-btn');
+            btn.classList.add('opacity-40', 'cursor-not-allowed');
+            btn.innerText = "❌ Used";
+            playTone(440, 0.15, 'sawtooth', 0.06);
+        }
+
+        function prankFriend() {
+            const pranks = [
+                "👻 Anda mengirim gangguan 'Layar Berkedip' ke teman sebelah!",
+                "🌪️ Anda mengirim 'Angin Puyuh' membuat waktu berpikir teman berkurang 5 detik!",
+                "🎯 Anda berhasil menjahili teman dengan notifikasi usil!"
+            ];
+            const randomPrank = pranks[Math.floor(Math.random() * pranks.length)];
+            document.getElementById('board-event-msg').innerText = randomPrank;
+            playTone(300, 0.2, 'sawtooth', 0.1);
+        }
+
+        function startQuiz(e) {
+            e.preventDefault();
+            const name = document.getElementById('student-name').value.trim();
+            const npm = document.getElementById('student-npm').value.trim();
+            if (!name || !npm) return alert('Harap isi nama dan NPM terlebih dahulu!');
+
+            studentInfo = { name, npm, character: selectedCharacter };
+            currentLevel = 0;
+            score = 0;
+            correctCount = 0;
+            wrongCount = 0;
+            boosters = { time: true, fifty: true };
+
+            document.getElementById('active-char-badge').innerHTML = `${studentInfo.character.emoji} ${studentInfo.character.name}`;
+
+            ['time', 'fifty'].forEach(b => {
+                const btn = document.getElementById(`booster-${b}-btn`);
+                btn.classList.remove('opacity-40', 'cursor-not-allowed');
+                if(b==='time') btn.innerText = "⏱️ +10s";
+                if(b==='fifty') btn.innerText = "❌ 50:50";
+            });
+
+            document.getElementById('quiz-instruction-card').classList.add('hidden');
+            document.getElementById('quiz-question-card').classList.remove('hidden');
+            document.getElementById('quiz-result-card').classList.add('hidden');
+
+            document.getElementById('board-event-msg').innerText = "";
+            renderQuestion();
+
+            if (!isBgmPlaying) {
+                toggleBGM();
+            }
+        }
+
+        function startTimer() {
+            clearInterval(timerInterval);
+            timeLeft = 30;
+            document.getElementById('timer-count').innerText = timeLeft;
+
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                document.getElementById('timer-count').innerText = timeLeft;
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    handleTimeout();
+                }
+            }, 1000);
+        }
+
+        function handleTimeout() {
+            const container = document.getElementById('options-container');
+            Array.from(container.children).forEach(child => {
+                child.disabled = true;
+                child.classList.add('cursor-not-allowed', 'opacity-60');
+            });
+            wrongCount++;
+            document.getElementById('board-event-msg').innerText = "⚠️ Waktu habis!";
+            document.getElementById('rationale-text').innerText = "Waktu habis! " + (quizData[currentLevel].rationale || "Tidak ada penjelasan.");
+            document.getElementById('rationale-box').classList.remove('hidden');
+            document.getElementById('next-btn').classList.remove('hidden');
+            playTone(150, 0.3, 'sawtooth', 0.1);
+        }
+
+        function renderQuestion() {
+            const q = quizData[currentLevel];
+            document.getElementById('quiz-progress').innerText = `Soal ${currentLevel + 1} dari 20`;
+            document.getElementById('current-score-display').innerText = score;
+            document.getElementById('question-text').innerText = q.question;
+            
+            const mediaContainer = document.getElementById('question-media-container');
+            const qImage = document.getElementById('question-image');
+            if (q.image && q.image.trim() !== "") {
+                qImage.src = q.image;
+                mediaContainer.classList.remove('hidden');
+            } else {
+                mediaContainer.classList.add('hidden');
+                qImage.src = "";
+            }
+
+            const container = document.getElementById('options-container');
+            container.innerHTML = '';
+            document.getElementById('rationale-box').classList.add('hidden');
+            document.getElementById('next-btn').classList.add('hidden');
+
+            const shuffledOptions = [...q.answerOptions].sort(() => Math.random() - 0.5);
+
+            shuffledOptions.forEach((opt) => {
+                const btn = document.createElement('button');
+                btn.className = "w-full text-left p-3.5 rounded-xl border border-slate-200 hover:border-red-500 hover:bg-red-50/50 text-sm font-medium transition flex items-center justify-between text-slate-700 bg-white shadow-xs";
+                btn.innerHTML = `<span>${opt.text}</span>`;
+                btn.onclick = () => selectAnswer(opt, shuffledOptions, q.rationale);
+                container.appendChild(btn);
+            });
+
+            startTimer();
+        }
+
+        function selectAnswer(selectedOpt, allOptions, rationale) {
+            clearInterval(timerInterval);
+            const container = document.getElementById('options-container');
+            Array.from(container.children).forEach(child => {
+                child.disabled = true;
+                child.classList.add('cursor-not-allowed');
+            });
+
+            Array.from(container.children).forEach((child) => {
+                const optText = child.querySelector('span').innerText;
+                const matchOpt = allOptions.find(o => o.text === optText);
+                if (matchOpt.isCorrect) {
+                    child.className = "w-full text-left p-3.5 rounded-xl border border-emerald-300 bg-emerald-50 text-emerald-900 text-sm font-medium transition flex items-center justify-between";
+                } else if (optText === selectedOpt.text && !selectedOpt.isCorrect) {
+                    child.className = "w-full text-left p-3.5 rounded-xl border border-rose-300 bg-rose-50 text-rose-900 text-sm font-medium transition flex items-center justify-between";
+                } else {
+                    child.classList.add('opacity-40');
+                }
+            });
+
+            const eventMsg = document.getElementById('board-event-msg');
+
+            if (selectedOpt.isCorrect) {
+                correctCount++;
+                const timeBonus = timeLeft * 2;
+                score += (50 + timeBonus);
+                playTone(587.33, 0.2, 'sine', 0.08);
+                eventMsg.innerText = "✨ Jawaban Benar! Poin bertambah.";
+            } else {
+                wrongCount++;
+                eventMsg.innerText = "❌ Jawaban kurang tepat.";
+                playTone(200, 0.3, 'sawtooth', 0.08);
+            }
+
+            document.getElementById('current-score-display').innerText = score;
+            document.getElementById('rationale-text').innerText = rationale || "Tidak ada penjelasan tambahan.";
+            document.getElementById('rationale-box').classList.remove('hidden');
+            document.getElementById('next-btn').classList.remove('hidden');
+        }
+
+        function nextQuestion() {
+            currentLevel++;
+            document.getElementById('board-event-msg').innerText = "";
+            if (currentLevel < quizData.length) {
+                renderQuestion();
+            } else {
+                finishQuiz();
+            }
+        }
+
+        function finishQuiz() {
+            clearInterval(timerInterval);
+            document.getElementById('quiz-question-card').classList.add('hidden');
+            document.getElementById('quiz-result-card').classList.remove('hidden');
+            document.getElementById('final-score').innerText = score;
+            document.getElementById('final-correct').innerText = correctCount;
+            document.getElementById('final-wrong').innerText = wrongCount;
+
+            playTone(783.99, 0.4, 'triangle', 0.1);
+
+            saveToLeaderboard({
+                name: studentInfo.name,
+                npm: studentInfo.npm,
+                character: studentInfo.character,
+                score: score,
+                correct: correctCount,
+                wrong: wrongCount,
+                date: new Date().toLocaleDateString('id-ID')
+            });
+        }
+
+        function saveToLeaderboard(record) {
+            let lb = JSON.parse(localStorage.getItem('pak_leaderboard_febi_noboard') || '[]');
+            const existingIndex = lb.findIndex(item => item.npm === record.npm);
+            if (existingIndex > -1) {
+                if (record.score > lb[existingIndex].score) {
+                    lb[existingIndex] = record;
+                }
+            } else {
+                lb.push(record);
+            }
+            lb.sort((a, b) => b.score - a.score);
+            localStorage.setItem('pak_leaderboard_febi_noboard', JSON.stringify(lb));
+        }
+
+        function loadLeaderboard() {
+            const tbody = document.getElementById('leaderboard-body');
+            tbody.innerHTML = '';
+            let lb = JSON.parse(localStorage.getItem('pak_leaderboard_febi_noboard') || '[]');
+
+            if (lb.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-slate-400 italic">Belum ada mahasiswa yang menyelesaikan kuis.</td></tr>`;
+                return;
+            }
+
+            lb.forEach((item, index) => {
+                let badgeColor = "text-slate-700 bg-slate-100 border border-slate-200";
+                if (index === 0) badgeColor = "text-amber-800 bg-amber-100 border border-amber-300 font-bold";
+                else if (index === 1) badgeColor = "text-slate-800 bg-slate-200 border border-slate-300 font-bold";
+                else if (index === 2) badgeColor = "text-amber-900 bg-amber-50 border border-amber-200 font-bold";
+
+                const charInfo = item.character || { emoji: '👤', name: 'Pemain' };
+
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 transition";
+                tr.innerHTML = `
+                    <td class="py-3 px-3"><span class="inline-block px-2.5 py-1 rounded-lg text-xs ${badgeColor}">#${index + 1}</span></td>
+                    <td class="py-3 px-3 font-semibold text-slate-800 flex items-center gap-2">
+                        <span class="text-xl bg-slate-100 p-1.5 rounded-xl border border-slate-200">${charInfo.emoji}</span>
+                        <div>
+                            <div class="text-sm">${item.name}</div>
+                            <div class="text-[10px] text-slate-500 font-normal">${charInfo.name}</div>
+                        </div>
+                    </td>
+                    <td class="py-3 px-3 text-slate-500 font-mono text-xs">${item.npm}</td>
+                    <td class="py-3 px-3 text-center text-xs font-semibold">
+                        <span class="text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">Benar: ${item.correct !== undefined ? item.correct : '-'}</span>
+                        <span class="text-rose-700 bg-rose-50 px-2 py-0.5 rounded border border-rose-200 ml-1">Salah: ${item.wrong !== undefined ? item.wrong : '-'}</span>
+                    </td>
+                    <td class="py-3 px-3 text-right font-bold text-red-600 text-base">${item.score} <span class="text-[10px] text-slate-400 font-normal">pts</span></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function resetQuiz() {
+            document.getElementById('quiz-result-card').classList.add('hidden');
+            document.getElementById('quiz-instruction-card').classList.remove('hidden');
+            document.getElementById('student-name').value = '';
+            document.getElementById('student-npm').value = '';
+            renderCharacterSelection();
+        }
+    </script>
+</body>
+</html>
